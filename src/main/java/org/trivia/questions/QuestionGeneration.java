@@ -4,11 +4,13 @@ import ai.knowly.langtoch.capability.module.openai.unit.SimpleChatCapabilityUnit
 import ai.knowly.langtoch.prompt.template.PromptTemplate;
 import com.google.common.collect.ImmutableList;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 public class QuestionGeneration {
 
-    public static String generateQuestion() throws ExecutionException, InterruptedException {
+    public static Map<String, String> generateQuestion() throws ExecutionException, InterruptedException {
         // Reading the key from the environment variable under Resource folder(.env file, OPENAI_API_KEY field)
         SimpleChatCapabilityUnit chatBot = SimpleChatCapabilityUnit.create();
 
@@ -32,6 +34,19 @@ public class QuestionGeneration {
                                         + "{option D}\n"
                                         + "{answer}")
                         .build();
-        return chatBot.run(promptTemplate.format());
+        String results = chatBot.run(promptTemplate.format());
+        System.out.println(results);
+
+        String[] lines = results.split("\n");
+        Map<String, String> triviaQuestions = new HashMap<>();
+
+        triviaQuestions.put("question", lines[0]);
+        triviaQuestions.put("optionA", lines[1]);
+        triviaQuestions.put("optionB", lines[2]);
+        triviaQuestions.put("optionC", lines[3]);
+        triviaQuestions.put("optionD", lines[4]);
+        triviaQuestions.put("answer", lines[5]);
+
+        return triviaQuestions;
     }
 }
