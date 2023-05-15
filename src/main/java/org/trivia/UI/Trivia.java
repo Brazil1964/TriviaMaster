@@ -5,6 +5,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import static javax.swing.JOptionPane.showMessageDialog;
 
 import org.trivia.questions.QuestionGeneration;
 
@@ -17,9 +18,13 @@ public class Trivia implements ActionListener, MouseListener {
 
     Map<String, String> triviaQuestions;
 
-    JLabel questionLabel;
+    JLabel questionLabel, scoreLabel;
+
+    int scoreCounter;
 
     public Trivia() throws ExecutionException, InterruptedException{
+        scoreCounter = 0;
+
         frame = new JFrame("Trivia Master");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -52,6 +57,7 @@ public class Trivia implements ActionListener, MouseListener {
         // Begin at index 8 because I have the "answer: " prefix
         answer = triviaQuestions.get("answer").substring(8);
 
+        // pull generated question from QuestionGeneration
         questionLabel = new JLabel(triviaQuestions.get("question"));
         frame.add(questionLabel, BorderLayout.NORTH);
 
@@ -67,6 +73,30 @@ public class Trivia implements ActionListener, MouseListener {
         selectionFour.setText(triviaQuestions.get("optionD"));
         selections.add(selectionFour);
 
+        scoreLabel = new JLabel("Score: " + scoreCounter);
+        frame.add(scoreLabel, BorderLayout.CENTER);
+    }
+
+    public void generateNewQuestions() throws ExecutionException, InterruptedException {
+        triviaQuestions = QuestionGeneration.generateQuestion();
+
+        scoreLabel.setText("Score: " + scoreCounter);
+
+        selectionOne.setBackground(Color.WHITE);
+        selectionTwo.setBackground(Color.WHITE);
+        selectionThree.setBackground(Color.WHITE);
+        selectionFour.setBackground(Color.WHITE);
+
+        selectionOne.setText(triviaQuestions.get("optionA"));
+
+        selectionTwo.setText(triviaQuestions.get("optionB"));
+
+        selectionThree.setText(triviaQuestions.get("optionC"));
+
+        selectionFour.setText(triviaQuestions.get("optionD"));
+        answer = triviaQuestions.get("answer").substring(8);
+
+        questionLabel.setText(triviaQuestions.get("question"));
     }
 
     @Override
@@ -74,35 +104,50 @@ public class Trivia implements ActionListener, MouseListener {
         if (ae.getSource() == selectionOne) {
             if (answer.equals("a")){
                 System.out.println("Correct!");
-                selectionOne.setBackground(Color.GREEN);
+                scoreCounter += 10;
+
             } else {
                 System.out.println("Incorrect!");
                 selectionOne.setBackground(Color.RED);
+                scoreCounter = 0;
+                showMessageDialog(null, "The correct answer is: " + answer);
             }
         } else if (ae.getSource() == selectionTwo) {
             if (answer.equals("b")) {
                 System.out.println("Correct!");
-                selectionTwo.setBackground(Color.GREEN);
+                scoreCounter += 10;
             } else {
                 System.out.println("Incorrect!");
                 selectionTwo.setBackground(Color.RED);
+                scoreCounter = 0;
+                showMessageDialog(null, "The correct answer is: " + answer);
             }
         } else if (ae.getSource() == selectionThree) {
             if (answer.equals("c")) {
                 System.out.println("Correct!");
-                selectionThree.setBackground(Color.GREEN);
+                scoreCounter += 10;
             } else {
                 System.out.println("Incorrect!");
                 selectionThree.setBackground(Color.RED);
+                scoreCounter = 0;
+                showMessageDialog(null, "The correct answer is: " + answer);
             }
         } else if (ae.getSource() == selectionFour) {
             if (answer.equals("d")) {
                 System.out.println("Correct!");
-                selectionFour.setBackground(Color.GREEN);
+                scoreCounter += 10;
+
             } else {
                 System.out.println("Incorrect!");
                 selectionFour.setBackground(Color.RED);
+                scoreCounter = 0;
+                showMessageDialog(null, "The correct answer is: " + answer);
             }
+        }
+        try {
+            generateNewQuestions();
+        } catch (ExecutionException | InterruptedException e) {
+            throw new RuntimeException(e);
         }
     }
 
