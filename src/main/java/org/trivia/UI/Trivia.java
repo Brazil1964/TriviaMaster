@@ -12,21 +12,19 @@ import org.trivia.questions.QuestionGeneration;
 public class Trivia implements ActionListener, MouseListener {
     JFrame frame;
     JPanel selections;
-
     String answer;
     JButton selectionOne, selectionTwo, selectionThree, selectionFour;
-
     Map<String, String> triviaQuestions;
-
-    JLabel questionLabel, scoreLabel;
-
+    JLabel questionLabel, scoreLabel, highScoreLabel;
     int scoreCounter;
-
-    public Trivia() throws ExecutionException, InterruptedException{
+    int highScore = 0;
+    String triviaType;
+    public Trivia(String triviaType) throws ExecutionException, InterruptedException{
         scoreCounter = 0;
+        this.triviaType = triviaType;
 
         frame = new JFrame("Trivia Master");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         selections = new JPanel();
         selections.setLayout(new GridLayout(2, 2));
@@ -52,6 +50,7 @@ public class Trivia implements ActionListener, MouseListener {
         frame.setSize(500, 200);
         frame.setVisible(true);
 
+        QuestionGeneration.triviaType = triviaType;
         triviaQuestions = QuestionGeneration.generateQuestion();
 
         // Begin at index 8 because I have the "answer: " prefix
@@ -75,12 +74,17 @@ public class Trivia implements ActionListener, MouseListener {
 
         scoreLabel = new JLabel("Score: " + scoreCounter);
         frame.add(scoreLabel, BorderLayout.CENTER);
+
+        highScoreLabel = new JLabel("High Score: " + highScore);
+        frame.add(highScoreLabel, BorderLayout.CENTER);
     }
 
     public void generateNewQuestions() throws ExecutionException, InterruptedException {
+        QuestionGeneration.triviaType = triviaType;
         triviaQuestions = QuestionGeneration.generateQuestion();
 
         scoreLabel.setText("Score: " + scoreCounter);
+        highScoreLabel.setText("High Score: " + highScore);
 
         selectionOne.setBackground(Color.WHITE);
         selectionTwo.setBackground(Color.WHITE);
@@ -99,49 +103,43 @@ public class Trivia implements ActionListener, MouseListener {
         questionLabel.setText(triviaQuestions.get("question"));
     }
 
+    public void correctSelection() {
+        highScore = Math.max(highScore, scoreCounter);
+        scoreCounter += 10;
+    }
+
+    public void wrongSelection(JButton selection) {
+        highScore = Math.max(highScore, scoreCounter);
+        scoreCounter = 0;
+        selection.setBackground(Color.RED);
+        showMessageDialog(null, "The correct answer is: " + answer + "\n" + "High Score: " + highScore);
+    }
+
     @Override
     public void actionPerformed(ActionEvent ae) {
         if (ae.getSource() == selectionOne) {
             if (answer.equals("a")){
-                System.out.println("Correct!");
-                scoreCounter += 10;
-
+                correctSelection();
             } else {
-                System.out.println("Incorrect!");
-                selectionOne.setBackground(Color.RED);
-                scoreCounter = 0;
-                showMessageDialog(null, "The correct answer is: " + answer);
+                wrongSelection(selectionOne);
             }
         } else if (ae.getSource() == selectionTwo) {
             if (answer.equals("b")) {
-                System.out.println("Correct!");
-                scoreCounter += 10;
+                correctSelection();
             } else {
-                System.out.println("Incorrect!");
-                selectionTwo.setBackground(Color.RED);
-                scoreCounter = 0;
-                showMessageDialog(null, "The correct answer is: " + answer);
+                wrongSelection(selectionTwo);
             }
         } else if (ae.getSource() == selectionThree) {
             if (answer.equals("c")) {
-                System.out.println("Correct!");
-                scoreCounter += 10;
+                correctSelection();
             } else {
-                System.out.println("Incorrect!");
-                selectionThree.setBackground(Color.RED);
-                scoreCounter = 0;
-                showMessageDialog(null, "The correct answer is: " + answer);
+                wrongSelection(selectionThree);
             }
         } else if (ae.getSource() == selectionFour) {
             if (answer.equals("d")) {
-                System.out.println("Correct!");
-                scoreCounter += 10;
-
+                correctSelection();
             } else {
-                System.out.println("Incorrect!");
-                selectionFour.setBackground(Color.RED);
-                scoreCounter = 0;
-                showMessageDialog(null, "The correct answer is: " + answer);
+                wrongSelection(selectionFour);
             }
         }
         try {

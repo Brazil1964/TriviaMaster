@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 public class QuestionGeneration {
-
+    public static String triviaType;
     public static Map<String, String> generateQuestion() throws ExecutionException, InterruptedException {
         // Reading the key from the environment variable under Resource folder(.env file, OPENAI_API_KEY field)
         SimpleChatCapabilityUnit chatBot = SimpleChatCapabilityUnit.create();
@@ -26,7 +26,7 @@ public class QuestionGeneration {
                                                 + "d) 1000\n"
                                                 + "answer: b"))
                         .setTemplate(
-                                "Can you please generate a trivia question by following the response template:\n"
+                                "Can you please generate a " + triviaType +  " trivia question by following the response template:\n"
                                         + "{question}\n"
                                         + "{option A}\n"
                                         + "{option B}\n"
