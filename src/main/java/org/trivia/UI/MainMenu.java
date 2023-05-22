@@ -8,7 +8,7 @@ import java.util.concurrent.ExecutionException;
 public class MainMenu implements ActionListener {
 
     JFrame frame;
-    JButton typeOne, typeTwo, typeThree, typeFour, typeFive;
+    JButton typeOne, typeTwo, typeThree, typeFour, typeFive, typeSix;
     public MainMenu() {
         frame = new JFrame("Trivia Selection");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -29,11 +29,15 @@ public class MainMenu implements ActionListener {
         typeFive = new JButton("Pop Culture");
         typeFive.addActionListener(this);
 
+        typeSix = new JButton("Programming");
+        typeSix.addActionListener(this);
+
         frame.add(typeOne);
         frame.add(typeTwo);
         frame.add(typeThree);
         frame.add(typeFour);
         frame.add(typeFive);
+        frame.add(typeSix);
 
         frame.setSize(500, 200);
         frame.setVisible(true);
@@ -53,6 +57,8 @@ public class MainMenu implements ActionListener {
             triviaType = typeFour.getText();
         } else if (ae.getSource() == typeFive) {
             triviaType = typeFive.getText();
+        } else if (ae.getSource() == typeSix) {
+            triviaType = typeSix.getText() + " (Only ask facts questions, no code questions)";
         }
 
         try {

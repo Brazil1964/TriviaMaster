@@ -15,10 +15,13 @@ public class Trivia implements ActionListener, MouseListener {
     String answer;
     JButton selectionOne, selectionTwo, selectionThree, selectionFour;
     Map<String, String> triviaQuestions;
-    JLabel questionLabel, scoreLabel, highScoreLabel;
+    JLabel questionLabel, scoreLabel, timeLabel;
     int scoreCounter;
     int highScore = 0;
     String triviaType;
+    Timer timer;
+    int countdown;
+
     public Trivia(String triviaType) throws ExecutionException, InterruptedException{
         scoreCounter = 0;
         this.triviaType = triviaType;
@@ -75,8 +78,9 @@ public class Trivia implements ActionListener, MouseListener {
         scoreLabel = new JLabel("Score: " + scoreCounter);
         frame.add(scoreLabel, BorderLayout.CENTER);
 
-        highScoreLabel = new JLabel("High Score: " + highScore);
-        frame.add(highScoreLabel, BorderLayout.CENTER);
+        timer = new Timer(10000, this);
+        timeLabel = new JLabel();
+        frame.add(timeLabel, BorderLayout.EAST);
     }
 
     public void generateNewQuestions() throws ExecutionException, InterruptedException {
@@ -84,7 +88,6 @@ public class Trivia implements ActionListener, MouseListener {
         triviaQuestions = QuestionGeneration.generateQuestion();
 
         scoreLabel.setText("Score: " + scoreCounter);
-        highScoreLabel.setText("High Score: " + highScore);
 
         selectionOne.setBackground(Color.WHITE);
         selectionTwo.setBackground(Color.WHITE);
@@ -101,17 +104,43 @@ public class Trivia implements ActionListener, MouseListener {
         answer = triviaQuestions.get("answer").substring(8);
 
         questionLabel.setText(triviaQuestions.get("question"));
+
+        countdown = 10;
+        timeLabel.setText("Time: " + countdown);
+
+        timer = new Timer(1000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (countdown > 0) {
+                    countdown--;
+                    timeLabel.setText("Time: " + countdown);
+                } else {
+                    timer.stop();
+                    wrongSelection(null);
+                    try {
+                        generateNewQuestions();
+                    } catch (ExecutionException | InterruptedException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
+            }
+        });
+        timer.start();
     }
 
+
     public void correctSelection() {
-        highScore = Math.max(highScore, scoreCounter);
-        scoreCounter += 10;
+        timer.stop();
+        scoreCounter += 1;
     }
 
     public void wrongSelection(JButton selection) {
+        timer.stop();
         highScore = Math.max(highScore, scoreCounter);
         scoreCounter = 0;
-        selection.setBackground(Color.RED);
+        if (selection != null) {
+            selection.setBackground(Color.RED);
+        }
         showMessageDialog(null, "The correct answer is: " + answer + "\n" + "High Score: " + highScore);
     }
 
@@ -142,10 +171,11 @@ public class Trivia implements ActionListener, MouseListener {
                 wrongSelection(selectionFour);
             }
         }
+
         try {
             generateNewQuestions();
-        } catch (ExecutionException | InterruptedException e) {
-            throw new RuntimeException(e);
+        } catch (ExecutionException | InterruptedException ex) {
+            throw new RuntimeException(ex);
         }
     }
 
