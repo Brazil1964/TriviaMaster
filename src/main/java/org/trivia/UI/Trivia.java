@@ -81,6 +81,30 @@ public class Trivia implements ActionListener, MouseListener {
         timer = new Timer(10000, this);
         timeLabel = new JLabel();
         frame.add(timeLabel, BorderLayout.EAST);
+        startTimer();
+    }
+
+    public void startTimer() {
+        countdown = 10;
+        timeLabel.setText("Time: " + countdown);
+        timer = new Timer(1000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                if (countdown > 0) {
+                    countdown--;
+                    timeLabel.setText("Time: " + countdown);
+                } else {
+                    timer.stop();
+                    wrongSelection(null);
+                    try {
+                        generateNewQuestions();
+                    } catch (ExecutionException | InterruptedException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
+            }
+        });
+        timer.start();
     }
 
     public void generateNewQuestions() throws ExecutionException, InterruptedException {
@@ -105,29 +129,8 @@ public class Trivia implements ActionListener, MouseListener {
 
         questionLabel.setText(triviaQuestions.get("question"));
 
-        countdown = 10;
-        timeLabel.setText("Time: " + countdown);
-
-        timer = new Timer(1000, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (countdown > 0) {
-                    countdown--;
-                    timeLabel.setText("Time: " + countdown);
-                } else {
-                    timer.stop();
-                    wrongSelection(null);
-                    try {
-                        generateNewQuestions();
-                    } catch (ExecutionException | InterruptedException ex) {
-                        throw new RuntimeException(ex);
-                    }
-                }
-            }
-        });
-        timer.start();
+        startTimer();
     }
-
 
     public void correctSelection() {
         timer.stop();
