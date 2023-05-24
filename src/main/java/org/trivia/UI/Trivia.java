@@ -7,94 +7,104 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
-import static javax.swing.JOptionPane.showMessageDialog;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.trivia.questions.QuestionGeneration;
 
-public class Trivia implements ActionListener, MouseListener {
-    JFrame frame;
-    JPanel selections;
-    String answer;
-    JButton selectionOne, selectionTwo, selectionThree, selectionFour;
-    Map<String, String> triviaQuestions;
-    JLabel questionLabel, scoreLabel, timeLabel;
-    int scoreCounter;
-    int highScore = 0;
-    String triviaType;
-    Timer timer;
-    int countdown;
+import static javax.swing.JOptionPane.showMessageDialog;
 
-    public Trivia(String triviaType) throws ExecutionException, InterruptedException{
+public class Trivia implements ActionListener, MouseListener {
+    private static final Logger LOGGER = Logger.getLogger(Trivia.class.getName());
+    private static final int TIMER_DELAY = 1000;
+    private static final int FRAME_WIDTH = 800;
+    private static final int FRAME_HEIGHT = 500;
+    private static final int BUTTON_PREFERRED_SIZE = 50;
+    private static final int COUNTDOWN_SECONDS = 15;
+
+    private JFrame frame;
+    private JPanel selections;
+    private String answer;
+    private JButton optionButtonOne, optionButtonTwo, optionButtonFour, optionButtonFive;
+    private Map<String, String> triviaQuestions;
+    private JLabel questionLabel, scoreLabel, timeLabel;
+    private int scoreCounter;
+    private int highScore = 0;
+    private String triviaType;
+    private Timer timer;
+    private int countdown;
+
+    public Trivia(String triviaType) throws ExecutionException, InterruptedException {
         scoreCounter = 0;
         this.triviaType = triviaType;
 
+        setupFrame();
+        setupButtons();
+        setupTriviaQuestions();
+        setupLabels();
+        startTimer();
+    }
+
+    private void setupFrame() {
         frame = new JFrame("Trivia Master");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setSize(FRAME_WIDTH, FRAME_HEIGHT);
+        frame.setVisible(true);
+    }
 
+    private void setupButtons() {
         Border emptyBorder = new EmptyBorder(10, 10, 10, 10);
 
         selections = new JPanel();
         selections.setLayout(new GridLayout(2, 2));
 
-        selectionOne = new JButton("Selection One");
-        selectionOne.addActionListener(this);
-        selectionOne.setPreferredSize(new Dimension(50, 50));
-
-        selectionTwo = new JButton("Selection Two");
-        selectionTwo.addActionListener(this);
-        selectionTwo.setPreferredSize(new Dimension(50, 50));
-
-        selectionThree = new JButton("Selection Three");
-        selectionThree.addActionListener(this);
-        selectionThree.setPreferredSize(new Dimension(50, 50));
-
-        selectionFour = new JButton("Selection Four");
-        selectionFour.addActionListener(this);
-        selectionFour.setPreferredSize(new Dimension(50, 50));
+        optionButtonOne = createButton("Selection One");
+        optionButtonTwo = createButton("Selection Two");
+        optionButtonFour = createButton("Selection Three");
+        optionButtonFive = createButton("Selection Four");
 
         frame.add(selections, BorderLayout.SOUTH);
+    }
 
-        frame.setSize(800, 200);
-        frame.setVisible(true);
+    private JButton createButton(String text) {
+        JButton button = new JButton(text);
+        button.addActionListener(this);
+        button.setPreferredSize(new Dimension(BUTTON_PREFERRED_SIZE, BUTTON_PREFERRED_SIZE));
+        selections.add(button);
+        return button;
+    }
 
+    private void setupTriviaQuestions() throws ExecutionException, InterruptedException {
         QuestionGeneration.triviaType = triviaType;
         triviaQuestions = QuestionGeneration.generateQuestion();
 
         // Begin at index 8 because I have the "answer: " prefix
         answer = triviaQuestions.get("answer").substring(8);
+    }
+
+    private void setupLabels() {
+        Border emptyBorder = new EmptyBorder(10, 10, 10, 10);
 
         // pull generated question from QuestionGeneration
         questionLabel = new JLabel(triviaQuestions.get("question"));
         questionLabel.setBorder(emptyBorder);
         frame.add(questionLabel, BorderLayout.NORTH);
 
-        selectionOne.setText(triviaQuestions.get("optionA"));
-        selections.add(selectionOne);
-
-        selectionTwo.setText(triviaQuestions.get("optionB"));
-        selections.add(selectionTwo);
-
-        selectionThree.setText(triviaQuestions.get("optionC"));
-        selections.add(selectionThree);
-
-        selectionFour.setText(triviaQuestions.get("optionD"));
-        selections.add(selectionFour);
+        updateButtonLabels();
 
         scoreLabel = new JLabel("Score: " + scoreCounter);
         scoreLabel.setBorder(emptyBorder);
         frame.add(scoreLabel, BorderLayout.CENTER);
 
-        timer = new Timer(10000, this);
         timeLabel = new JLabel();
         timeLabel.setBorder(emptyBorder);
         frame.add(timeLabel, BorderLayout.EAST);
-        startTimer();
     }
 
     public void startTimer() {
-        countdown = 10;
+        countdown = COUNTDOWN_SECONDS;
         timeLabel.setText("Time: " + countdown);
-        timer = new Timer(1000, new ActionListener() {
+        timer = new Timer(TIMER_DELAY, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
                 if (countdown > 0) {
@@ -106,7 +116,7 @@ public class Trivia implements ActionListener, MouseListener {
                     try {
                         generateNewQuestions();
                     } catch (ExecutionException | InterruptedException ex) {
-                        throw new RuntimeException(ex);
+                        LOGGER.log(Level.SEVERE, "Failed to generate new questions", ex);
                     }
                 }
             }
@@ -120,18 +130,10 @@ public class Trivia implements ActionListener, MouseListener {
 
         scoreLabel.setText("Score: " + scoreCounter);
 
-        selectionOne.setBackground(Color.WHITE);
-        selectionTwo.setBackground(Color.WHITE);
-        selectionThree.setBackground(Color.WHITE);
-        selectionFour.setBackground(Color.WHITE);
+        resetButtonBackgrounds();
 
-        selectionOne.setText(triviaQuestions.get("optionA"));
+        updateButtonLabels();
 
-        selectionTwo.setText(triviaQuestions.get("optionB"));
-
-        selectionThree.setText(triviaQuestions.get("optionC"));
-
-        selectionFour.setText(triviaQuestions.get("optionD"));
         answer = triviaQuestions.get("answer").substring(8);
 
         questionLabel.setText(triviaQuestions.get("question"));
@@ -139,8 +141,22 @@ public class Trivia implements ActionListener, MouseListener {
         startTimer();
     }
 
+    private void resetButtonBackgrounds() {
+        optionButtonOne.setBackground(Color.WHITE);
+        optionButtonTwo.setBackground(Color.WHITE);
+        optionButtonFour.setBackground(Color.WHITE);
+        optionButtonFive.setBackground(Color.WHITE);
+    }
+
+    private void updateButtonLabels() {
+        optionButtonOne.setText(triviaQuestions.get("optionA"));
+        optionButtonTwo.setText(triviaQuestions.get("optionB"));
+        optionButtonFour.setText(triviaQuestions.get("optionC"));
+        optionButtonFive.setText(triviaQuestions.get("optionD"));
+    }
+
     public void correctSelection(JButton selection) {
-        selection.setBackground(Color.GREEN);
+//        selection.setBackground(Color.GREEN); // ISSUE: Color not updating
         timer.stop();
         scoreCounter += 1;
     }
@@ -157,36 +173,36 @@ public class Trivia implements ActionListener, MouseListener {
 
     @Override
     public void actionPerformed(ActionEvent ae) {
-        if (ae.getSource() == selectionOne) {
+        if (ae.getSource() == optionButtonOne) {
             if (answer.equals("a")){
-                correctSelection(selectionOne);
+                correctSelection(optionButtonOne);
             } else {
-                wrongSelection(selectionOne);
+                wrongSelection(optionButtonOne);
             }
-        } else if (ae.getSource() == selectionTwo) {
+        } else if (ae.getSource() == optionButtonTwo) {
             if (answer.equals("b")) {
-                correctSelection(selectionTwo);
+                correctSelection(optionButtonTwo);
             } else {
-                wrongSelection(selectionTwo);
+                wrongSelection(optionButtonTwo);
             }
-        } else if (ae.getSource() == selectionThree) {
+        } else if (ae.getSource() == optionButtonFour) {
             if (answer.equals("c")) {
-                correctSelection(selectionThree);
+                correctSelection(optionButtonFour);
             } else {
-                wrongSelection(selectionThree);
+                wrongSelection(optionButtonFour);
             }
-        } else if (ae.getSource() == selectionFour) {
+        } else if (ae.getSource() == optionButtonFive) {
             if (answer.equals("d")) {
-                correctSelection(selectionFour);
+                correctSelection(optionButtonFive);
             } else {
-                wrongSelection(selectionFour);
+                wrongSelection(optionButtonFive);
             }
         }
 
         try {
             generateNewQuestions();
         } catch (ExecutionException | InterruptedException ex) {
-            throw new RuntimeException(ex);
+            LOGGER.log(Level.SEVERE, "Failed to generate new questions", ex);
         }
     }
 

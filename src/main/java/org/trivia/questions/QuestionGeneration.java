@@ -47,6 +47,9 @@ public class QuestionGeneration {
                         .addVariableValuePair("generated_questions", questionCollection).build();
         String results = chatBot.run(promptTemplate.format());
         questions.add(results);
+        if (questions.size() == 3) {
+            questions.remove(0);
+        }
         System.out.println(results);
 
         String[] lines = results.split("\n");
