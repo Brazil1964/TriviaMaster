@@ -1,6 +1,8 @@
 package org.trivia.UI;
 
 import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Map;
@@ -29,6 +31,8 @@ public class Trivia implements ActionListener, MouseListener {
         frame = new JFrame("Trivia Master");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
+        Border emptyBorder = new EmptyBorder(10, 10, 10, 10);
+
         selections = new JPanel();
         selections.setLayout(new GridLayout(2, 2));
 
@@ -50,7 +54,7 @@ public class Trivia implements ActionListener, MouseListener {
 
         frame.add(selections, BorderLayout.SOUTH);
 
-        frame.setSize(500, 200);
+        frame.setSize(800, 200);
         frame.setVisible(true);
 
         QuestionGeneration.triviaType = triviaType;
@@ -61,6 +65,7 @@ public class Trivia implements ActionListener, MouseListener {
 
         // pull generated question from QuestionGeneration
         questionLabel = new JLabel(triviaQuestions.get("question"));
+        questionLabel.setBorder(emptyBorder);
         frame.add(questionLabel, BorderLayout.NORTH);
 
         selectionOne.setText(triviaQuestions.get("optionA"));
@@ -76,10 +81,12 @@ public class Trivia implements ActionListener, MouseListener {
         selections.add(selectionFour);
 
         scoreLabel = new JLabel("Score: " + scoreCounter);
+        scoreLabel.setBorder(emptyBorder);
         frame.add(scoreLabel, BorderLayout.CENTER);
 
         timer = new Timer(10000, this);
         timeLabel = new JLabel();
+        timeLabel.setBorder(emptyBorder);
         frame.add(timeLabel, BorderLayout.EAST);
         startTimer();
     }
@@ -132,7 +139,8 @@ public class Trivia implements ActionListener, MouseListener {
         startTimer();
     }
 
-    public void correctSelection() {
+    public void correctSelection(JButton selection) {
+        selection.setBackground(Color.GREEN);
         timer.stop();
         scoreCounter += 1;
     }
@@ -142,7 +150,7 @@ public class Trivia implements ActionListener, MouseListener {
         highScore = Math.max(highScore, scoreCounter);
         scoreCounter = 0;
         if (selection != null) {
-            selection.setBackground(Color.RED);
+            selection.setBackground(Color.PINK);
         }
         showMessageDialog(null, "The correct answer is: " + answer + "\n" + "High Score: " + highScore);
     }
@@ -151,25 +159,25 @@ public class Trivia implements ActionListener, MouseListener {
     public void actionPerformed(ActionEvent ae) {
         if (ae.getSource() == selectionOne) {
             if (answer.equals("a")){
-                correctSelection();
+                correctSelection(selectionOne);
             } else {
                 wrongSelection(selectionOne);
             }
         } else if (ae.getSource() == selectionTwo) {
             if (answer.equals("b")) {
-                correctSelection();
+                correctSelection(selectionTwo);
             } else {
                 wrongSelection(selectionTwo);
             }
         } else if (ae.getSource() == selectionThree) {
             if (answer.equals("c")) {
-                correctSelection();
+                correctSelection(selectionThree);
             } else {
                 wrongSelection(selectionThree);
             }
         } else if (ae.getSource() == selectionFour) {
             if (answer.equals("d")) {
-                correctSelection();
+                correctSelection(selectionFour);
             } else {
                 wrongSelection(selectionFour);
             }
