@@ -19,8 +19,10 @@ public class Trivia implements ActionListener, MouseListener {
     private static final int TIMER_DELAY = 1000;
     private static final int FRAME_WIDTH = 800;
     private static final int FRAME_HEIGHT = 500;
-    private static final int BUTTON_PREFERRED_SIZE = 50;
+    private static final int BUTTON_PREFERRED_SIZE = 100;
     private static final int COUNTDOWN_SECONDS = 15;
+    private static final int BUTTONS_FONT_SIZE = 20;
+    private static final int QUESTION_FONT_SIZE = 24;
 
     private JFrame frame;
     private JPanel selections;
@@ -49,6 +51,7 @@ public class Trivia implements ActionListener, MouseListener {
         frame = new JFrame("Trivia Master");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setSize(FRAME_WIDTH, FRAME_HEIGHT);
+//        frame.setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.Y_AXIS));
         frame.setVisible(true);
     }
 
@@ -70,6 +73,7 @@ public class Trivia implements ActionListener, MouseListener {
         JButton button = new JButton(text);
         button.addActionListener(this);
         button.setPreferredSize(new Dimension(BUTTON_PREFERRED_SIZE, BUTTON_PREFERRED_SIZE));
+        button.setFont(new Font("Arial", Font.PLAIN, BUTTONS_FONT_SIZE)); // Set button font
         selections.add(button);
         return button;
     }
@@ -86,18 +90,22 @@ public class Trivia implements ActionListener, MouseListener {
         Border emptyBorder = new EmptyBorder(10, 10, 10, 10);
 
         // pull generated question from QuestionGeneration
-        questionLabel = new JLabel(triviaQuestions.get("question"));
+        // use html to wrap text: https://stackoverflow.com/questions/2420742/make-a-jlabel-wrap-its-text-by-setting-a-max-width
+        questionLabel = new JLabel("<html>" + triviaQuestions.get("question") + "</html>");
         questionLabel.setBorder(emptyBorder);
+        questionLabel.setFont(new Font("Arial", Font.BOLD, QUESTION_FONT_SIZE));
         frame.add(questionLabel, BorderLayout.NORTH);
 
         updateButtonLabels();
 
         scoreLabel = new JLabel("Score: " + scoreCounter);
         scoreLabel.setBorder(emptyBorder);
+        scoreLabel.setFont(new Font("Arial", Font.BOLD, BUTTONS_FONT_SIZE));
         frame.add(scoreLabel, BorderLayout.CENTER);
 
         timeLabel = new JLabel();
         timeLabel.setBorder(emptyBorder);
+        timeLabel.setFont(new Font("Arial", Font.BOLD, BUTTONS_FONT_SIZE));
         frame.add(timeLabel, BorderLayout.EAST);
     }
 
@@ -149,10 +157,10 @@ public class Trivia implements ActionListener, MouseListener {
     }
 
     private void updateButtonLabels() {
-        optionButtonOne.setText(triviaQuestions.get("optionA"));
-        optionButtonTwo.setText(triviaQuestions.get("optionB"));
-        optionButtonFour.setText(triviaQuestions.get("optionC"));
-        optionButtonFive.setText(triviaQuestions.get("optionD"));
+        optionButtonOne.setText("<html>" + triviaQuestions.get("optionA") + "</html>");
+        optionButtonTwo.setText("<html>" + triviaQuestions.get("optionB") + "</html>");
+        optionButtonFour.setText("<html>" + triviaQuestions.get("optionC") + "</html>");
+        optionButtonFive.setText("<html>" + triviaQuestions.get("optionD") + "</html>");
     }
 
     public void correctSelection(JButton selection) {
