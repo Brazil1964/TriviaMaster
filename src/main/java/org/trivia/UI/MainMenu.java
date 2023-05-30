@@ -67,7 +67,7 @@ public class MainMenu implements ActionListener {
             throw new RuntimeException(e);
         }
 
-//        frame.dispose(); // use this to hide the main menu when a question type is generated
+        frame.dispose(); // use this to hide the main menu when a question type is generated
     }
 
     public static void main(String[] args) {
