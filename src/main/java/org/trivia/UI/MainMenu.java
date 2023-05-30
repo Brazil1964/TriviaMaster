@@ -6,7 +6,8 @@ import java.awt.event.*;
 import java.util.concurrent.ExecutionException;
 
 public class MainMenu implements ActionListener {
-
+    private static final int FRAME_WIDTH = 500;
+    private static final int FRAME_HEIGHT = 200;
     JFrame frame;
     JButton typeOne, typeTwo, typeThree, typeFour, typeFive, typeSix;
     public MainMenu() {
@@ -39,7 +40,7 @@ public class MainMenu implements ActionListener {
         frame.add(typeFive);
         frame.add(typeSix);
 
-        frame.setSize(500, 200);
+        frame.setSize(FRAME_WIDTH, FRAME_HEIGHT);
         frame.setVisible(true);
     }
 

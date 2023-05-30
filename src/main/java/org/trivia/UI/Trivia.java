@@ -51,13 +51,10 @@ public class Trivia implements ActionListener, MouseListener {
         frame = new JFrame("Trivia Master");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setSize(FRAME_WIDTH, FRAME_HEIGHT);
-//        frame.setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.Y_AXIS));
         frame.setVisible(true);
     }
 
     private void setupButtons() {
-        Border emptyBorder = new EmptyBorder(10, 10, 10, 10);
-
         selections = new JPanel();
         selections.setLayout(new GridLayout(2, 2));
 
@@ -144,7 +141,7 @@ public class Trivia implements ActionListener, MouseListener {
 
         answer = triviaQuestions.get("answer").substring(8);
 
-        questionLabel.setText(triviaQuestions.get("question"));
+        questionLabel.setText("<html>" + triviaQuestions.get("question") + "</html>");
 
         startTimer();
     }
